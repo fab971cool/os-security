@@ -1,6 +1,7 @@
 linux-6.18.55/
 linux-6.18.55.tar.xz
 *.pdf
+initramfs/
 
 
 # gitignore template for C/C++ projects
