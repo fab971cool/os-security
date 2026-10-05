@@ -1,4 +1,5 @@
-set -xe
+#!/bin/bash
+set -eu
 
 
 export BUILDS=$PWD
@@ -8,14 +9,14 @@ export BUSYBOX_BUILD=$BUILDS/busybox
 # Construction du répertoire contenant notre systeme de fichiers racine
 mkdir -p $INITRAMFS_BUILD
 cd $INITRAMFS_BUILD
-mkdir -p bin sbin etc proc sys dev usr/bin usr/sbin
+mkdir -p bin sbin etc proc sys dev usr/bin usr/sbin usr/lib usr/lib64 
 
 # Retour dans notre répertoire et copie de busybox
 cd $BUILDS
 cp -a $BUSYBOX_BUILD/_install/* $BUILDS/initramfs
 
 # Compilation du programme init_loop qui boucle et spawn un shell
-gcc $BUILDS/my_init_loop/main.c -o $INITRAMFS_BUILD/init_loop
+gcc -static -march=x86-64 -mtune=generic $BUILDS/my_init_loop/main.c -o $INITRAMFS_BUILD/init_loop
 
 
 # Copie de la bibliothèque C depuis le système hôte
@@ -23,13 +24,13 @@ mkdir -p $INITRAMFS_BUILD/lib/x86_64-linux-gnu/
 mkdir -p $INITRAMFS_BUILD/lib64
 
 # copie des bibliothèques C standards dans notre systeme de fichiers racine
-cp /usr/lib/libc.so.6 $INITRAMFS_BUILD/lib/x86_64-linux-gnu/
+cp /usr/lib/libc.so.6 $INITRAMFS_BUILD/usr/lib
 
-cp /usr/lib/libm.so.6 $INITRAMFS_BUILD/lib/x86_64-linux-gnu/
+cp /usr/lib/libm.so.6 $INITRAMFS_BUILD/usr/lib
 
-cp /usr/lib/libresolv.so.2 $INITRAMFS_BUILD/lib/x86_64-linux-gnu/
+cp /usr/lib/libresolv.so.2 $INITRAMFS_BUILD/usr/lib
 
-cp /lib64/ld-linux-x86-64.so.2 $INITRAMFS_BUILD/lib64
+cp /lib64/ld-linux-x86-64.so.2 $INITRAMFS_BUILD/usr/lib64
 
 
 # Script init lancé par le noyau au démarrage
@@ -56,3 +57,5 @@ chmod +x $INITRAMFS_BUILD/init
 # construction de l'image initramfs GPIO gzippée
 cd $BUILDS/initramfs
 find . -print0 | cpio --null -ov --format=newc | gzip -9 > $BUILDS/initramfs.cpio.gz
+
+echo "qemu-system-x86_64 -enable-kvm -cpu host -kernel /path/to/bzImage -initrd $BUILDS/initramfs.cpio.gz -append "console=ttyS0" -nographic"

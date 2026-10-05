@@ -50,5 +50,12 @@ Troubleshoot : "error: « TCA_CBQ_MAX » non déclaré"
 ```sh
 make menuconfig
 ```
-- Décodher :  Network Utilities --> [ ] tc
+- Décocher :  Network Utilities --> [ ] tc
 
+```sh
+qemu-system-x86_64 -enable-kvm -cpu host \
+    -kernel /path/to/bzImage \
+    -initrd $BUILDS/initramfs.cpio.gz \
+    -append "console=ttyS0" -nographic
+```
+![alt text](image.png)
