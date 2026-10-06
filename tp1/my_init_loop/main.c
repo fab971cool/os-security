@@ -10,17 +10,26 @@ int main()
     {
         // Infinite loop to keep the init process running
         pid_t pid = fork();
-        int status = 0;
+        if (pid < 0)
+        {
+            perror("fork failed");
+            sleep(1);
+            continue;
+        }
         if (pid)
         {
+            int status = 0;
             waitpid(pid, &status, 0);
             printf("Infinite loop\n");
             pid = 0;
         }
         else
         {
-            char *tab[] = {"usr/bin/setsid", "cttyhack", "sh", NULL};
+            // définition des arguments de execv
+            char *tab[] = {"setsid", "cttyhack", "sh", NULL};
             execv("/usr/bin/setsid", tab);
+            perror("execv failed");
+            _exit(127);
         }
     }
 }

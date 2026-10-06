@@ -24,13 +24,13 @@ mkdir -p $INITRAMFS_BUILD/lib/x86_64-linux-gnu/
 mkdir -p $INITRAMFS_BUILD/lib64
 
 # copie des bibliothèques C standards dans notre systeme de fichiers racine
-cp /usr/lib/libc.so.6 $INITRAMFS_BUILD/usr/lib
+#cp /usr/lib/libc.so.6 $INITRAMFS_BUILD/lib
 
-cp /usr/lib/libm.so.6 $INITRAMFS_BUILD/usr/lib
+#cp /usr/lib/libm.so.6 $INITRAMFS_BUILD/lib
 
-cp /usr/lib/libresolv.so.2 $INITRAMFS_BUILD/usr/lib
+#cp /usr/lib/libresolv.so.2 $INITRAMFS_BUILD/lib
 
-cp /lib64/ld-linux-x86-64.so.2 $INITRAMFS_BUILD/usr/lib64
+#cp /lib64/ld-linux-x86-64.so.2 $INITRAMFS_BUILD/lib64
 
 
 # Script init lancé par le noyau au démarrage
@@ -39,7 +39,7 @@ cat > $INITRAMFS_BUILD/init <<'END'
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev
-cat <<!
+cat <<'!'
 Boot took $(cut -d' ' -f1 /proc/uptime) seconds
 ___________ .__ ________ _______________ _______
 \_ _____/ ____ ____ | | ____ \_____ \/ _____/\ _ \ \ _ \
@@ -49,7 +49,7 @@ ___________ .__ ________ _______________ _______
 \/ \/ \/ \/ \/ \/ \/
 Welcome to "Ecole 2600 linux"
 !
-/init_loop
+exec /init_loop
 END
 
 chmod +x $INITRAMFS_BUILD/init
@@ -58,4 +58,4 @@ chmod +x $INITRAMFS_BUILD/init
 cd $BUILDS/initramfs
 find . -print0 | cpio --null -ov --format=newc | gzip -9 > $BUILDS/initramfs.cpio.gz
 
-echo "qemu-system-x86_64 -enable-kvm -cpu host -kernel /path/to/bzImage -initrd $BUILDS/initramfs.cpio.gz -append "console=ttyS0" -nographic"
+echo "qemu-system-x86_64 -enable-kvm -cpu host -kernel /path/to/bzImage -initrd $BUILDS/initramfs.cpio.gz -append 'console=ttyS0' -nographic"
