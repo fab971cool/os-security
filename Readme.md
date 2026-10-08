@@ -117,3 +117,17 @@ Bilan :
 - création d'un Système de fichier (initramfs) et des programmes de busybox avec un programme init dans `initramfs/init && initramfs/init_loop`
 - Mise en place d'un serveur NFS sur le système hôte
 - Lancement de la machine avec Qemu
+
+
+# Modules out-of-tree
+
+Pour ajouter des appels systèmes, on les écrit en C en dehors du noyau afin de les rajouter avec `insmod program.ko` 
+Les modules ne diposent pas de la glibc mais des fonctions natives du noyau.
+Pour bien comprendre, tp2, présente une façon d'écrire un module OOT(Out-Of-Tree).
+- Création d'un périph misc nommé "version" : `/dev/version`
+- La lecture renvoie la version actuelle du noyau : `cat /dev/version`
+- l'écriture change la version du noyau (affiché dans `/dev/version`) : `echo "1.2.3" > /dev/version`
+- l'utilisation de ioctl : (à implémenter)
+
+
+
